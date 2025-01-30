@@ -1,0 +1,3 @@
+To get training data visit: https://git-disl.github.io/GTDLBench/datasets/mnist_datasets/
+
+then download mnist, extract the files, and mnist training data to your project
