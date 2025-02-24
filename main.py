@@ -54,7 +54,7 @@ def randun(data, model):
         xtemp = x.copy()
         while(np.argmax(probabilities) == y):
             i += .01
-            xtemp = np.clip(x + i * (XRAN NOT DONE), 0 , 1)
+            xtemp = np.clip(x + i * (np.random.rand(len(x))), 0 , 1)
             probabilities = forward(xtemp)
         x = xtemp
     return retdata
