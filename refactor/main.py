@@ -7,6 +7,7 @@ def main():
     mnist_train = None
     mnist_test = None
     model = None
+    FGSMUntargeted = None
     # Load the data
     with open('mnist_train.pkl', 'rb') as fid:
         mnist_train = pickle.load(fid)
@@ -14,6 +15,8 @@ def main():
         mnist_test = pickle.load(fid)
     with open('model.pkl', 'rb') as fid:
         model = pickle.load(fid)
+    with open('fgsmun_train.pkl', 'rb') as fid:
+        FGSMUntargeted = pickle.load(fid)
     print(mnist_train)
     
 

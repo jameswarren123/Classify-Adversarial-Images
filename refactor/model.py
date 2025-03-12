@@ -1,3 +1,8 @@
+import torch
+import torch.nn as nn
+import numpy as np
+
+
 class SimpleNN():
     
     def __init__(self, input_size, hidden_size, output_size):
@@ -34,3 +39,14 @@ class SimpleNN():
         loss = self.criterion(output, y)
         loss.backward()
         return x.grad.numpy()
+    
+    def train(self, train_loader, epochs=10):
+        for epoch in range(epochs):
+            for data, target in train_loader:
+                data, target = torch.tensor(data, dtype=torch.float32), torch.tensor(target, dtype=torch.long)
+                self.optimizer.zero_grad()
+                output = self.model(data)
+                loss = self.criterion(output, target)
+                loss.backward()
+                self.optimizer.step()
+            print(f'Epoch {epoch+1}/{epochs}, Loss: {loss.item()}')
