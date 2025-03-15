@@ -71,10 +71,7 @@ def train_with_device(self, train_loader, epochs=10):
 
 model.train(train_loader, epochs=10)
 
-# Save the trained model
 try:
-    # Fix 6: Both saving methods are valid, but pickle is used here
-    # torch.save(model.state_dict(), 'model.pth')  # Alternative using PyTorch's method
     with open('model.pkl', 'wb') as fid:
         pickle.dump(model, fid)
 except Exception as e:
