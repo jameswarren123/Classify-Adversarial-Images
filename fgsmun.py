@@ -7,19 +7,8 @@ mnist_mean = 0.1307
 mnist_std = 0.3081
 
 def fgsmun(data, model):
-    """
-    Fast Gradient Sign Method (Untargeted) for MNIST data.
-    
-    Args:
-        data: pandas DataFrame with labels in first column and pixel values in remaining columns
-        model: trained neural network model
-    Returns:
-        DataFrame with adversarial examples
-    """
     retData = data.copy(deep=True)
-    
-    # Fix 1: Convert pixel columns to float type to avoid dtype warning
-    pixel_columns = retData.columns[1:]  # All columns except the label
+    pixel_columns = retData.columns[1:]
     retData[pixel_columns] = retData[pixel_columns].astype(np.float32)
     
     for i in range(len(data)):
@@ -41,20 +30,16 @@ def fgsmun(data, model):
             probabilities = model.predict(x)
             iteration += 1
         
-        # Fix 2: Unnormalize and clip, keeping as float until assignment
         x = (x * mnist_std) + mnist_mean
-        x = np.clip(x * 255, 0, 255)  # Values are floats between 0-255
+        x = np.clip(x * 255, 0, 255)
         
-        # Assign values (no dtype conflict since columns are now float32)
         retData.iloc[i, 0] = y
-        #retData.iloc[i, 1:] = x.flatten()
+        retData.iloc[i, 1:] = x.flatten()
     
-    # Fix 3: Optional - convert back to int if integer pixels are required
     retData[pixel_columns] = retData[pixel_columns].astype(np.uint8)
     
     return retData
 
-# Rest of your code
 try:
     with open('mnist_train.pkl', 'rb') as fid:
         mnist_train = pickle.load(fid)
