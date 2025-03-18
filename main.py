@@ -38,7 +38,6 @@ def normalize(X):
 def unnormalize(X):
     X = (X * mnist_std) + mnist_mean
     X *= 255
-
     return X.astype(np.uint8)
 
 def visualize_example(x_img, y_probs, b_unnormalize=True, label=-1,
@@ -91,9 +90,9 @@ def visualize_example(x_img, y_probs, b_unnormalize=True, label=-1,
     else:
         fig.savefig(filename)
     plt.close(fig)
-##################################
-#ignore these methods for testing#
-##################################
+####################################
+# ignore these methods for testing #
+####################################
 
 
 
@@ -104,9 +103,9 @@ def main():
     # data collectoin and initialization #
     # ---------------------------------- #
     ###### initialize variables of data to load ######
-    #mnist_train = None
+    mnist_train = None
     mnist_test = None
-    #model = None
+    model = None
     FGSMUntargeted = None
     FGSMTargeted = None
     DeepFoolUntargeted = None
@@ -120,28 +119,55 @@ def main():
     #    mnist_train = pickle.load(fid)
     with open('mnist_test.pkl', 'rb') as fid:
         mnist_test = pickle.load(fid)
-    #with open('model.pkl', 'rb') as fid:
-        #model = pickle.load(fid)
+    with open('model.pkl', 'rb') as fid:
+        model = pickle.load(fid)
+        
+    # ---------------------------- #
+    # confirm mnist model accuracy #
+    # ---------------------------- #
+    # correct = 0
+    # total = 9999
+    # class_counts = np.zeros(10)
+    # class_correct = np.zeros(10)
+    # for i in range(total):
+    #     x = normalize(mnist_test.iloc[i, 1:].values)
+    #     y = int(mnist_test.iloc[i, 0])
+    #     class_counts[y] += 1
+    #     label = np.argmax(model.predict(x))
+    #     if label == y:
+    #         correct += 1
+    #         class_correct[y] += 1
+    # print(correct/total) # 0.9745974597459746
+    # print(class_correct/class_counts) # [0.9877551  0.99295154 0.95639535 0.96831683 0.98370672 
+    #                                   # 0.96636771 0.99060543 0.97663096 0.9650924  0.95639247]
+    # ------------------------------------------ #
+    # back to our regularly scheduled programing #
+    # ------------------------------------------ #
+    
     with open('fgsmun_train.pkl', 'rb') as fid:
         FGSMUntargeted = pickle.load(fid)
-    with open('fgsmtar_train.pkl', 'rb') as fid:
-        FGSMTargeted = pickle.load(fid)
-    with open('deepfoolun_train.pkl', 'rb') as fid:
-        DeepFoolUntargeted = pickle.load(fid)
-    with open('deepfooltar_train.pkl', 'rb') as fid:
-        DeepFoolTargeted = pickle.load(fid)
-    with open('carliniwagnertar_train.pkl', 'rb') as fid:
-        CarliniWagnerTargeted = pickle.load(fid)
-    with open('randun_train.pkl', 'rb') as fid:
-        randUntargeted = pickle.load(fid)
+    # with open('fgsmtar_train.pkl', 'rb') as fid:
+    #     FGSMTargeted = pickle.load(fid)
+    # with open('deepfoolun_train.pkl', 'rb') as fid:
+    #     DeepFoolUntargeted = pickle.load(fid)
+    # with open('deepfooltar_train.pkl', 'rb') as fid:
+    #     DeepFoolTargeted = pickle.load(fid)
+    # with open('carliniwagnertar_train.pkl', 'rb') as fid:
+    #     CarliniWagnerTargeted = pickle.load(fid)
+    # with open('randun_train.pkl', 'rb') as fid:
+    #     randUntargeted = pickle.load(fid)
+    
     
 
     # my testing ignore ######
-    #visualize_example(FGSMUntargeted.iloc[0, 1:].values, model.predict(FGSMUntargeted.iloc[0, 1:].values), label=FGSMUntargeted.iloc[0, 0], filename='example.png')
-    #print(model.predict(normalize(mnist_test.iloc[0, 1:].values)))
-    #visualize_example(mnist_test.iloc[0, 1:].values, model.predict(normalize(mnist_test.iloc[0, 1:].values)), label=mnist_test.iloc[0, 0], filename='example2.png')
+    print(FGSMUntargeted.iloc[1])
+    print(model.predict(normalize(FGSMUntargeted.iloc[1, 1:].values)))
+    visualize_example(FGSMUntargeted.iloc[1, 1:].values, model.predict(normalize(FGSMUntargeted.iloc[1, 1:].values)), label=FGSMUntargeted.iloc[1, 0], filename='example.png')
+    print(mnist_test.iloc[1])
+    print(model.predict(normalize(mnist_test.iloc[1, 1:].values)))
+    visualize_example(mnist_test.iloc[1, 1:].values, model.predict(normalize(mnist_test.iloc[1, 1:].values)), label=mnist_test.iloc[1, 0], filename='exampleTestSet.png')
     # ignore stops here ######
-
+    return 1
     #combine data to train classifier on 4000 true images and 400*6 adversarial images
     trainingData = pd.concat([mnist_test[:4000],FGSMUntargeted, FGSMTargeted, DeepFoolUntargeted, DeepFoolTargeted, CarliniWagnerTargeted, randUntargeted])
    
@@ -242,6 +268,9 @@ def main():
     # ------------------------------- #
     # visualize classifiers and tests #
     # ------------------------------- #
+
+
+    
 
 
 
