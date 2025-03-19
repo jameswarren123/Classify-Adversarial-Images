@@ -161,9 +161,12 @@ def main():
     
     # with open('randun_train.pkl', 'rb') as fid:           #
     #     randUntargeted = pickle.load(fid)                 #
-    
-        
-
+    i = 0
+    while(np.argmax(model.predict(normalize(FGSMTargeted.iloc[i, 1:].values))) != FGSMTargeted.iloc[i, 0]) or (FGSMTargeted.iloc[i, 0] == 0):
+        i += 1
+    print(i)
+    visualize_example(FGSMTargeted.iloc[i, 1:].values, model.predict(normalize(FGSMTargeted.iloc[i, 1:].values)), label=FGSMTargeted.iloc[i, 0], filename=f'fgsmtar_images/example{i}.png')
+    return i
     # ------------------------- #
     # data visualization output #
     # ------------------------- #
