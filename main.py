@@ -38,7 +38,7 @@ def normalize(X):
 def unnormalize(X):
     X = (X * mnist_std) + mnist_mean
     X *= 255
-    return X.astype(np.uint8)
+    return np.clip(X, 0, 255).astype(np.uint8)
 
 def visualize_example(x_img, y_probs, b_unnormalize=True, label=-1,
                       filename=None):
@@ -144,29 +144,39 @@ def main():
     # back to our regularly scheduled programing #
     # ------------------------------------------ #
     
-    with open('fgsmun_train.pkl', 'rb') as fid:
-        FGSMUntargeted = pickle.load(fid)
-    # with open('fgsmtar_train.pkl', 'rb') as fid:
-    #     FGSMTargeted = pickle.load(fid)
-    # with open('deepfoolun_train.pkl', 'rb') as fid:
-    #     DeepFoolUntargeted = pickle.load(fid)
-    # with open('deepfooltar_train.pkl', 'rb') as fid:
-    #     DeepFoolTargeted = pickle.load(fid)
-    # with open('carliniwagnertar_train.pkl', 'rb') as fid:
-    #     CarliniWagnerTargeted = pickle.load(fid)
-    # with open('randun_train.pkl', 'rb') as fid:
-    #     randUntargeted = pickle.load(fid)
+    with open('fgsmun_train.pkl', 'rb') as fid:             # 0 fail to misclassify, 5 start misclassified 
+        FGSMUntargeted = pickle.load(fid)                   # 140.73 seconds runtime to build data
     
+    with open('fgsmtar_train.pkl', 'rb') as fid:            # 24 failed to misclassify, 38 started at 0
+        FGSMTargeted = pickle.load(fid)                     # 168.64 seconds
     
+    # with open('deepfoolun_train.pkl', 'rb') as fid:       #
+    #     DeepFoolUntargeted = pickle.load(fid)             #
+    
+    # with open('deepfooltar_train.pkl', 'rb') as fid:      #
+    #     DeepFoolTargeted = pickle.load(fid)               #
+    
+    # with open('carliniwagnertar_train.pkl', 'rb') as fid: #
+    #     CarliniWagnerTargeted = pickle.load(fid)          #
+    
+    # with open('randun_train.pkl', 'rb') as fid:           #
+    #     randUntargeted = pickle.load(fid)                 #
+    
+        
 
-    # my testing ignore ######
-    print(FGSMUntargeted.iloc[1])
-    print(model.predict(normalize(FGSMUntargeted.iloc[1, 1:].values)))
-    visualize_example(FGSMUntargeted.iloc[1, 1:].values, model.predict(normalize(FGSMUntargeted.iloc[1, 1:].values)), label=FGSMUntargeted.iloc[1, 0], filename='example.png')
-    print(mnist_test.iloc[1])
-    print(model.predict(normalize(mnist_test.iloc[1, 1:].values)))
-    visualize_example(mnist_test.iloc[1, 1:].values, model.predict(normalize(mnist_test.iloc[1, 1:].values)), label=mnist_test.iloc[1, 0], filename='exampleTestSet.png')
-    # ignore stops here ######
+    # ------------------------- #
+    # data visualization output #
+    # ------------------------- #
+    for i in range(10):
+        visualize_example(mnist_test.iloc[i, 1:].values, model.predict(normalize(mnist_test.iloc[i, 1:].values)), label=mnist_test.iloc[i, 0], filename=f'normal_images/example{i}.png')
+
+    for i in range(10):
+        visualize_example(FGSMUntargeted.iloc[i, 1:].values, model.predict(normalize(FGSMUntargeted.iloc[i, 1:].values)), label=FGSMUntargeted.iloc[i, 0], filename=f'fgsmun_images/example{i}.png')
+    
+    for i in range(10):
+        visualize_example(FGSMTargeted.iloc[i, 1:].values, model.predict(normalize(FGSMTargeted.iloc[i, 1:].values)), label=FGSMTargeted.iloc[i, 0], filename=f'fgsmtar_images/example{i}.png')
+    # ------------------------- #
+    
     return 1
     #combine data to train classifier on 4000 true images and 400*6 adversarial images
     trainingData = pd.concat([mnist_test[:4000],FGSMUntargeted, FGSMTargeted, DeepFoolUntargeted, DeepFoolTargeted, CarliniWagnerTargeted, randUntargeted])
@@ -214,18 +224,23 @@ def main():
     # ------- #
 
     #test classifier1 on 1000 true images and 100*6 adversarial images
-    with open('fgsmun_test.pkl', 'rb') as fid:
-        FGSMUntargeted = pickle.load(fid)
-    with open('fgsmtar_test.pkl', 'rb') as fid:
-        FGSMTargeted = pickle.load(fid)
-    with open('deepfoolun_test.pkl', 'rb') as fid:
-        DeepFoolUntargeted = pickle.load(fid)
-    with open('deepfooltar_test.pkl', 'rb') as fid:
-        DeepFoolTargeted = pickle.load(fid)
-    with open('carliniwagnertar_test.pkl', 'rb') as fid:
-        CarliniWagnerTargeted = pickle.load(fid)
-    with open('randun_test.pkl', 'rb') as fid:
-        randUntargeted = pickle.load(fid)
+    with open('fgsmun_test.pkl', 'rb') as fid:           # 0 failed to miscalssify, 1 started misclassified
+        FGSMUntargeted = pickle.load(fid)                # 33.65 seconds to build data
+        
+    with open('fgsmtar_test.pkl', 'rb') as fid:          # 5 failed to classify, 10 started classified
+        FGSMTargeted = pickle.load(fid)                  # 43.18
+        
+    with open('deepfoolun_test.pkl', 'rb') as fid:       #
+        DeepFoolUntargeted = pickle.load(fid)            #
+    
+    with open('deepfooltar_test.pkl', 'rb') as fid:      #
+        DeepFoolTargeted = pickle.load(fid)              #
+    
+    with open('carliniwagnertar_test.pkl', 'rb') as fid: #
+        CarliniWagnerTargeted = pickle.load(fid)         #
+    
+    with open('randun_test.pkl', 'rb') as fid:           #
+        randUntargeted = pickle.load(fid)                #
     
     #combine data to train classifier on 4000 true images and 400*6 adversarial images
     testingData = pd.concat([mnist_test[4000:5000],FGSMUntargeted, FGSMTargeted, DeepFoolUntargeted, DeepFoolTargeted, CarliniWagnerTargeted, randUntargeted])
