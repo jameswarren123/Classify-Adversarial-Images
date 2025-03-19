@@ -31,9 +31,9 @@ mnist_std = 0.3081
 if mnist_train.empty or len(mnist_train.columns) != 785:
     raise ValueError("Invalid MNIST data format. Expected 785 columns (label + 784 pixels)")
 
-X_train = mnist_train.iloc[:100, 1:].values.astype(np.float32) / 255.0
+X_train = mnist_train.iloc[:, 1:].values.astype(np.float32) / 255.0
 X_train = (X_train - mnist_mean) / mnist_std
-y_train = mnist_train.iloc[:100, 0].values.astype(np.int64)
+y_train = mnist_train.iloc[:, 0].values.astype(np.int64)
 
 if X_train.shape[1] != 784:
     raise ValueError(f"Expected 784 features, got {X_train.shape[1]}")
