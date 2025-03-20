@@ -43,7 +43,7 @@ class SimpleNN(nn.Module):
             output = self.model(x)
             return torch.softmax(output, dim=1).detach().numpy()
     
-    def gradient(self, x, y):
+    def gradient(self, x, y, use_loss = False):
         """Compute input gradient."""
         try:
             x = x.reshape(-1, self.input_size)
@@ -51,8 +51,11 @@ class SimpleNN(nn.Module):
             y = torch.tensor(y, dtype=torch.long)
             self.model.zero_grad()
             output = self.model(x)
-            loss = self.criterion(output, y)
-            loss.backward()
+            if use_loss:
+                loss = self.criterion(output, y)
+                loss.backward()
+            else:
+                output[0, y].backward()
             return x.grad.numpy() if x.grad is not None else None
         except Exception as e:
             print(f"Error in gradient: {e}")

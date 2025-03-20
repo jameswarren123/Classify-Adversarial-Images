@@ -150,9 +150,12 @@ def main():
     with open('fgsmtar_train.pkl', 'rb') as fid:            # 24 failed to misclassify, 38 started at 0
         FGSMTargeted = pickle.load(fid)                     # 168.64 seconds
     
-    # with open('deepfoolun_train.pkl', 'rb') as fid:       #
-    #     DeepFoolUntargeted = pickle.load(fid)             #
-    
+    with open('dfun_train.pkl', 'rb') as fid:             #
+        DeepFoolUntargeted = pickle.load(fid)             #
+    print(model.gradient(normalize(DeepFoolUntargeted.iloc[1, 1:].values), np.array([0])))
+    print(model.gradient(normalize(DeepFoolUntargeted.iloc[1, 1:].values), np.array([4])))
+    visualize_example(DeepFoolUntargeted.iloc[1, 1:].values, model.predict(normalize(DeepFoolUntargeted.iloc[1, 1:].values)), label=DeepFoolUntargeted.iloc[1, 0], filename=f'dfun_images/example{0}.png')
+    return 1
     # with open('deepfooltar_train.pkl', 'rb') as fid:      #
     #     DeepFoolTargeted = pickle.load(fid)               #
     
