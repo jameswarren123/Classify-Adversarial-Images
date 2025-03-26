@@ -151,23 +151,23 @@ def main():
     # back to our regularly scheduled programing #
     # ------------------------------------------ #
     
-    with open('fgsmun_train.pkl', 'rb') as fid:             # 0 fail to misclassify, 5 start misclassified 
-        FGSMUntargeted = pickle.load(fid)                   # 140.73 seconds build time, # average iterations
+    with open('fgsmun_train.pkl', 'rb') as fid:           # 0 fail to misclassify, 5 start misclassified 
+        FGSMUntargeted = pickle.load(fid)                 # 140.73 seconds build time, # average iterations
         
-    with open('fgsmtar_train.pkl', 'rb') as fid:            # 24 failed to misclassify, 38 started at 0
-        FGSMTargeted = pickle.load(fid)                     # 168.64 seconds build time, # average iterations
+    with open('fgsmtar_train.pkl', 'rb') as fid:          # 24 failed to misclassify, 38 started at 0
+        FGSMTargeted = pickle.load(fid)                   # 168.64 seconds build time, # average iterations
     
-    with open('dfun_train.pkl', 'rb') as fid:               # 0 fail to misclassify, 10 start misclassified
-        DeepFoolUntargeted = pickle.load(fid)               # 321.40 seconds build time, 14.57 averave iterations
+    with open('dfun_train.pkl', 'rb') as fid:             # 0 fail to misclassify, 10 start misclassified
+        DeepFoolUntargeted = pickle.load(fid)             # 321.40 seconds build time, 14.57 averave iterations
     
-    with open('dftar_train.pkl', 'rb') as fid:              # 20 fail to misclassify, 40 start misclassified
-        DeepFoolTargeted = pickle.load(fid)                 # 241.83 seconds build time, 53.305 averave iterations
+    with open('dftar_train.pkl', 'rb') as fid:            # 20 fail to misclassify, 40 start misclassified
+        DeepFoolTargeted = pickle.load(fid)               # 241.83 seconds build time, 53.305 averave iterations
     
-    #with open('carliniwagnertar_train.pkl', 'rb') as fid: #
-        #CarliniWagnerTargeted = pickle.load(fid)          #
+    with open('carliniwagnertar_train.pkl', 'rb') as fid: #
+        CarliniWagnerTargeted = pickle.load(fid)          #
     
-    with open('randun_train.pkl', 'rb') as fid:             # 4 fail to misclassify, 8 start misclassified
-        randUntargeted = pickle.load(fid)                   # 139.99 seconds build time, 32.7675 averave iterations
+    with open('randun_train.pkl', 'rb') as fid:           # 4 fail to misclassify, 8 start misclassified
+        randUntargeted = pickle.load(fid)                 # 139.99 seconds build time, 32.7675 averave iterations
     
     # ------------------------- #
     # data visualization output #
