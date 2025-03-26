@@ -163,8 +163,8 @@ def main():
     with open('dftar_train.pkl', 'rb') as fid:              # 20 fail to misclassify, 40 start misclassified
         DeepFoolTargeted = pickle.load(fid)                 # 241.83 seconds build time, 53.305 averave iterations
     
-    # with open('carliniwagnertar_train.pkl', 'rb') as fid: #
-    #     CarliniWagnerTargeted = pickle.load(fid)          #
+    #with open('carliniwagnertar_train.pkl', 'rb') as fid: #
+        #CarliniWagnerTargeted = pickle.load(fid)          #
     
     with open('randun_train.pkl', 'rb') as fid:             # 4 fail to misclassify, 8 start misclassified
         randUntargeted = pickle.load(fid)                   # 139.99 seconds build time, 32.7675 averave iterations
@@ -185,7 +185,10 @@ def main():
         visualize_example(DeepFoolUntargeted.iloc[i, 1:].values, model.predict(normalize(DeepFoolUntargeted.iloc[i, 1:].values)), label=DeepFoolUntargeted.iloc[i, 0], filename=f'dfun_images/example{i}.png')
 
     for i in range(10):
-        visualize_example(DeepFoolUntargeted.iloc[i, 1:].values, model.predict(normalize(DeepFoolTargeted.iloc[i, 1:].values)), label=DeepFoolTargeted.iloc[i, 0], filename=f'dftar_images/example{i}.png')
+        visualize_example(DeepFoolTargeted.iloc[i, 1:].values, model.predict(normalize(DeepFoolTargeted.iloc[i, 1:].values)), label=DeepFoolTargeted.iloc[i, 0], filename=f'dftar_images/example{i}.png')
+    
+    #for i in range(10):
+        #visualize_example(CarliniWagnerTargeted.iloc[i, 1:].values, model.predict(normalize(CarliniWagnerTargeted.iloc[i, 1:].values)), label=CarliniWagnerTargeted.iloc[i, 0], filename=f'cnwun_images/example{i}.png')
     
     for i in range(10):
         visualize_example(randUntargeted.iloc[i, 1:].values, model.predict(normalize(randUntargeted.iloc[i, 1:].values)), label=randUntargeted.iloc[i, 0], filename=f'randun_images/example{i}.png')
