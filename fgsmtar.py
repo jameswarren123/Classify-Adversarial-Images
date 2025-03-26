@@ -10,11 +10,11 @@ mnist_std = 0.3081
 def normalize(X):
     X = X.astype(np.float32) / 255.0
     X = (X - mnist_mean) / mnist_std
-    return X
+    return X.reshape(-1, 1, 28, 28)
 def unnormalize(X):
     X = (X * mnist_std) + mnist_mean
     X *= 255
-    return np.clip(X, 0, 255).astype(np.uint8)
+    return np.clip(X, 0, 255).astype(np.uint8).reshape(784,)
 
 def fgsmtar(data, model):
     failsToMisclassify = 0
@@ -22,14 +22,14 @@ def fgsmtar(data, model):
     retData = data.copy(deep=True)
     pixel_columns = retData.columns[1:]
     retData[pixel_columns] = retData[pixel_columns].astype(np.float32)
+    totalIterations = 0
     
     for i in range(len(data)):
         x = normalize(data.iloc[i, 1:].values)
         y = np.array([int(data.iloc[i, 0])])
-        #print(x)
-        #print(y)
+        
         probabilities = model.predict(x)
-        epsilon = 0.005
+        epsilon = 0.0075
         max_iterations = 200
         iteration = 0
         
@@ -38,26 +38,19 @@ def fgsmtar(data, model):
             if gradients is None:
                 break
             x = x - epsilon * np.sign(gradients)
-            #print(epsilon * np.sign(gradients))
             probabilities = model.predict(normalize(unnormalize(x)))
             iteration += 1
+        
         if iteration >= max_iterations:
             failsToMisclassify += 1
         if iteration == 0:
             startsMisclassified += 1
-        # print("preun")
-        # print(x)
-        # print(model.predict(x))
-        # print("postun")
+        totalIterations += iteration
         
-        # print(x-normalize(unnormalize(x)))
-        # print(model.predict(normalize(unnormalize(x))))
-        #print(x)
-        x = unnormalize(x)
-        #print(x)
         retData.iloc[i, 0] = y[0]
-        retData.iloc[i, 1:] = x
-        #print(model.predict(normalize(retData.iloc[i, 1:].values)))
+        retData.iloc[i, 1:] = unnormalize(x)
+    
+    print(f"Average iterations to end: {totalIterations/len(data)}")
     print(f"Number failed to misclassify: {failsToMisclassify}")
     print(f"Number started miscalssified: {startsMisclassified}")
     retData[pixel_columns] = retData[pixel_columns].astype(np.uint8)
@@ -69,7 +62,7 @@ try:
         mnist_test = pickle.load(fid)
     with open('model.pkl', 'rb') as fid:
         model = pickle.load(fid)
-    #print(mnist_train[10000:10010])
+    
     print("training data")
     start_time = time.time()
     FGSMtargeted = fgsmtar(mnist_test[400:800], model)
