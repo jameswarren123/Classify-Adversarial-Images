@@ -1,76 +1,45 @@
 import torch
 import torch.nn as nn
+import torch.nn.functional as F
 import torch.optim as optim
 import numpy as np
 
 class SimpleNN(nn.Module):
     """A simple two-layer neural network."""
     
-    def __init__(self, input_size, hidden_size, output_size, lr=0.001):
+    def __init__(self):
         super(SimpleNN, self).__init__()
-        self.input_size = input_size
-        self.model = nn.Sequential(
-            nn.Linear(input_size, hidden_size),
-            nn.ReLU(),
-            nn.Linear(hidden_size, output_size)
-        )
-        self.criterion = nn.CrossEntropyLoss()
-        self.optimizer = optim.Adam(self.model.parameters(), lr=lr)
-
-    def compute_loss_gradient(self, x, y):
-        """Compute loss gradient for a single example."""
-        try:
-            x = x.reshape(1, -1)
-            if x.shape[1] != self.input_size:
-                raise ValueError(f"Expected input size {self.input_size}, got {x.shape[1]}")
-            x = torch.tensor(x, requires_grad=True, dtype=torch.float32)
-            y = torch.tensor(y, dtype=torch.long)
-            self.model.zero_grad()
-            output = self.model(x)
-            loss = self.criterion(output, y)
-            loss.backward()
-            return loss.item()
-        except Exception as e:
-            print(f"Error in compute_loss_gradient: {e}")
-            return None
-
+        self.conv1 = nn.Conv2d(1, 6, 5)
+        self.conv2 = nn.Conv2d(6, 16, 5)
+        self.fc1 = nn.Linear(16 * 4 * 4, 120)
+        self.fc2 = nn.Linear(120, 84)
+        self.fc3 = nn.Linear(84, 10)
+        
+    def forward(self, x):
+        c1 = F.relu(self.conv1(x))
+        s2 = F.max_pool2d(c1, (2, 2))
+        c3 = F.relu(self.conv2(s2))
+        s4 = F.max_pool2d(c3, 2)
+        s4 = torch.flatten(s4, 1)
+        f5 = F.relu(self.fc1(s4))
+        f6 = F.relu(self.fc2(f5))
+        output = self.fc3(f6)
+        return output
+    
     def predict(self, x):
-        """Make predictions with softmax probabilities."""
-        self.model.eval()
         with torch.no_grad():
-            x = x.reshape(-1, self.input_size)
+            x = x.reshape(-1, 1, 28, 28)
             x = torch.tensor(x, dtype=torch.float32)
-            output = self.model(x)
+            output = self(x)
             return torch.softmax(output, dim=1).detach().numpy()
-    
-    def gradient(self, x, y, use_loss = False):
-        """Compute input gradient."""
-        try:
-            x = x.reshape(-1, self.input_size)
-            x = torch.tensor(x, requires_grad=True, dtype=torch.float32)
-            y = torch.tensor(y, dtype=torch.long)
-            self.model.zero_grad()
-            output = self.model(x)
-            if use_loss:
-                loss = self.criterion(output, y)
-                loss.backward()
-            else:
-                output[0, y].backward()
-            return x.grad.numpy() if x.grad is not None else None
-        except Exception as e:
-            print(f"Error in gradient: {e}")
-            return None
-    
-    def train(self, train_loader, epochs=10):
-        """Train the model with a DataLoader."""
-        self.model.train()
-        for epoch in range(epochs):
-            running_loss = 0.0
-            for i, (data, target) in enumerate(train_loader):
-                self.optimizer.zero_grad()
-                output = self.model(data)
-                loss = self.criterion(output, target)
-                loss.backward()
-                self.optimizer.step()
-                running_loss += loss.item()
-            print(f'Epoch {epoch+1}/{epochs}, Loss: {running_loss/len(train_loader):.4f}')
+        
+    def gradient(self, x, y):
+        x = torch.tensor(x, dtype=torch.float32)
+        y = torch.tensor(y, dtype=torch.long)
+        self.eval()
+        x.requires_grad = True
+        output = self(x)
+        loss = F.cross_entropy(output, y)
+        self.zero_grad()
+        loss.backward()
+        return x.grad.numpy()

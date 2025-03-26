@@ -10,11 +10,11 @@ mnist_std = 0.3081
 def normalize(X):
     X = X.astype(np.float32) / 255.0
     X = (X - mnist_mean) / mnist_std
-    return X
+    return X.reshape(-1, 1, 28, 28)
 def unnormalize(X):
     X = (X * mnist_std) + mnist_mean
     X *= 255
-    return np.clip(X, 0, 255).astype(np.uint8)
+    return np.clip(X, 0, 255).astype(np.uint8).reshape(784,)
 
 def fgsmtar(data, model):
     failsToMisclassify = 0
@@ -34,7 +34,7 @@ def fgsmtar(data, model):
         iteration = 0
         
         while (np.argmax(probabilities) != 0 and iteration < max_iterations):
-            gradients = model.gradient(x, np.array([0]), True)
+            gradients = model.gradient(x, np.array([0]))
             if gradients is None:
                 break
             x = x - epsilon * np.sign(gradients)

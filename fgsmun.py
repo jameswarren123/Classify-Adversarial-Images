@@ -10,11 +10,11 @@ mnist_std = 0.3081
 def normalize(X):
     X = X.astype(np.float32) / 255.0
     X = (X - mnist_mean) / mnist_std
-    return X
+    return X.reshape(-1, 1, 28, 28)
 def unnormalize(X):
     X = (X * mnist_std) + mnist_mean
     X *= 255
-    return np.clip(X, 0, 255).astype(np.uint8)
+    return np.clip(X, 0, 255).astype(np.uint8).reshape(784,)
 
 def fgsmun(data, model):
     failsToMisclassify = 0
@@ -33,7 +33,7 @@ def fgsmun(data, model):
         max_iterations = 200
         iteration = 0
         while (np.argmax(probabilities) == y[0] and iteration < max_iterations):
-            gradients = model.gradient(x, y, True)
+            gradients = model.gradient(x, y)
             if gradients is None:
                 break
             x = x + epsilon * np.sign(gradients)
