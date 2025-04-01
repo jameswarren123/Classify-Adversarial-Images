@@ -16,7 +16,7 @@ def unnormalize(X):
     X *= 255
     return np.clip(X, 0, 255).astype(np.uint8).reshape(784,)
 
-def fgsmtar(data, model):
+def cnwtar(data, model):
     failsToMisclassify = 0
     startsMisclassified = 0
     retData = data.copy(deep=True)
@@ -27,32 +27,50 @@ def fgsmtar(data, model):
     for i in range(len(data)):
         x = normalize(data.iloc[i, 1:].values)
         y = np.array([int(data.iloc[i, 0])])
+        probabilities = model.predict(normalize(unnormalize(x)))
+        curClass = np.argmax(probabilities)
         
-        probabilities = model.predict(x)
-        epsilon = 0.0075
-        max_iterations = 200
+        if(curClass == 0):
+            startsMisclassified += 1
+            retData.iloc[i, 0] = y[0]
+            retData.iloc[i, 1:] = unnormalize(x)
+            continue
+        
         iteration = 0
+        max_iterations = 200
         
-        while (np.argmax(probabilities) != 0 and iteration < max_iterations):
-            gradients = model.gradient(x, np.array([0]))
-            if gradients is None:
-                break
-            x = x - epsilon * np.sign(gradients)
-            probabilities = model.predict(normalize(unnormalize(x)))
+        x_prime = x.copy()
+        iteration = 0
+        alpha = 1
+        beta = -4
+        learning_rate = .05
+        epsilon = 1
+        while curClass != 0 and iteration < max_iterations:
+            t_o_h = np.zeros(10)
+            t_o_h[0] = 1
+            max_class = np.argmax(model.predict(normalize(unnormalize(x_prime))) * (1 - t_o_h))
+            gradient = model.gradient(x_prime, np.array([0])) - model.gradient(x_prime, np.array([max_class]))
+            gradient *= beta
+            gradient += alpha * (-2*(x - x_prime))
+            x_prime += learning_rate * gradient
+            x_prime = np.clip(x_prime, x - epsilon, x + epsilon)
+            probabilities = model.predict(normalize(unnormalize(x_prime)))
+            curClass = np.argmax(probabilities)  
             iteration += 1
-        
+            
+        #print(probabilities)            
         if iteration >= max_iterations:
             failsToMisclassify += 1
         if iteration == 0:
             startsMisclassified += 1
+        print(iteration)
         totalIterations += iteration
-        
         retData.iloc[i, 0] = y[0]
-        retData.iloc[i, 1:] = unnormalize(x)
-    
+        retData.iloc[i, 1:] = unnormalize(x_prime)
+        
     print(f"Average iterations to end: {totalIterations/len(data)}")
     print(f"Number failed to misclassify: {failsToMisclassify}")
-    print(f"Number started at class 0: {startsMisclassified}")
+    print(f"Number started classified as 0: {startsMisclassified}")
     retData[pixel_columns] = retData[pixel_columns].astype(np.uint8)
     
     return retData
@@ -65,17 +83,17 @@ try:
     
     print("training data")
     start_time = time.time()
-    FGSMtargeted = fgsmtar(mnist_test[400:800], model)
+    CarliniWagnerTargeted = cnwtar(mnist_test[2000:2400], model)
     end_time = time.time()
     print(f"Create training data execution time: {end_time - start_time:.2f} seconds")
-    FGSMtargeted.to_pickle('fgsmtar_train.pkl')
+    CarliniWagnerTargeted.to_pickle('cnwtar_train.pkl')
     
     print("testing data")
     start_time = time.time()
-    FGSMtargeted = fgsmtar(mnist_test[6500:6600], model)
+    CarliniWagnerTargeted = cnwtar(mnist_test[6900:7000], model)
     end_time = time.time()
     print(f"Create testing data execution time: {end_time - start_time:.2f} seconds")
-    FGSMtargeted.to_pickle('fgsmtar_test.pkl')
+    CarliniWagnerTargeted.to_pickle('cnwtar_test.pkl')
 except FileNotFoundError as e:
     print(f"Error loading files: {e}")
 except Exception as e:

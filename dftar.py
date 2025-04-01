@@ -30,7 +30,7 @@ def dftar(data, model):
         probabilities = model.predict(normalize(unnormalize(x)))
         curClass = np.argmax(probabilities)
         
-        if(curClass != y[0]):
+        if(curClass == 0):
             startsMisclassified += 1
             retData.iloc[i, 0] = y[0]
             retData.iloc[i, 1:] = unnormalize(x)
@@ -66,7 +66,7 @@ def dftar(data, model):
         
     print(f"Average iterations to end: {totalIterations/len(data)}")
     print(f"Number failed to misclassify: {failsToMisclassify}")
-    print(f"Number started miscalssified: {startsMisclassified}")
+    print(f"Number started classified as 0: {startsMisclassified}")
     retData[pixel_columns] = retData[pixel_columns].astype(np.uint8)
     
     return retData
