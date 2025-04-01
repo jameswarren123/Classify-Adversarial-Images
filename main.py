@@ -221,7 +221,7 @@ def main():
     # ------------------------- #
     # data visualization output #
     # ------------------------- #
-    """"
+    
     for i in range(10):
         visualize_example(mnist_test.iloc[i, 1:].values, model.predict(normalize(mnist_test.iloc[i, 1:].values)), label=mnist_test.iloc[i, 0], filename=f'normal_images/example{i}.png')
 
@@ -237,14 +237,14 @@ def main():
     for i in range(10):
         visualize_example(DeepFoolTargeted.iloc[i, 1:].values, model.predict(normalize(DeepFoolTargeted.iloc[i, 1:].values)), label=DeepFoolTargeted.iloc[i, 0], filename=f'dftar_images/example{i}.png')
     
-    #for i in range(10):
-        #visualize_example(CarliniWagnerTargeted.iloc[i, 1:].values, model.predict(normalize(CarliniWagnerTargeted.iloc[i, 1:].values)), label=CarliniWagnerTargeted.iloc[i, 0], filename=f'cnwun_images/example{i}.png')
+    for i in range(10):
+        visualize_example(CarliniWagnerTargeted.iloc[i, 1:].values, model.predict(normalize(CarliniWagnerTargeted.iloc[i, 1:].values)), label=CarliniWagnerTargeted.iloc[i, 0], filename=f'cnwtar_images/example{i}.png')
     
     for i in range(10):
         visualize_example(randUntargeted.iloc[i, 1:].values, model.predict(normalize(randUntargeted.iloc[i, 1:].values)), label=randUntargeted.iloc[i, 0], filename=f'randun_images/example{i}.png')
     
     #return 1
-    """
+    
     # ------------------------- #
     
     
